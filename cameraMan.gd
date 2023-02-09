@@ -1,6 +1,7 @@
 extends Node
 
 var camera
+var springarm
 var player
 var cameraTypes = ["Chase","Orbit","Free","FirstPerson","ThirdPerson"]
 var foundCameraTypes:Dictionary
@@ -22,12 +23,20 @@ func Chase(target,close,far,delta):
 		else:
 			if chaser.translation.z > close:
 				chaser.translation.z -= 2.5*delta
+				
+func ThirdPerson(target,delta):
+	var ShoulderPoint = target.get_node("ThirdPerson")
+	springarm.translation = ShoulderPoint.get_global_translation()
+	#var sp_loc = ShoulderPoint.get_global_translation()
+	#var sp_loc = ShoulderPoint.translation
+	#camera.look_at(sp_loc,Vector3.UP)
+	#camera.translation = Vector3(sp_loc.x,sp_loc.y,sp_loc.z + 5	)
+	pass
 
-func Init(obj):
-	player = obj
-
-	### Find Camera 
-	camera = obj.find_node("Camera")
+func Init(obj,mode):
+	
+	#### Find Camera 
+	#print_debug(world.find_node("Camera"))
 	
 	### Find Types
 	for child in obj.get_children():
@@ -38,3 +47,20 @@ func Init(obj):
 		print_debug("Found: ",foundCameraTypes)
 	else:
 		print_debug("No Camera types found")
+	
+	player = obj
+	var world = obj.get_parent()
+	camera = Camera.new()
+	if mode == "ThirdPerson":
+		springarm = SpringArm.new()
+		player.get_node(mode).call_deferred("add_child", springarm)
+		springarm.call_deferred("add_child", camera)
+		springarm.spring_length = 5
+		springarm.margin = 0.2
+		springarm.set_as_toplevel(true)
+	else:
+		player.call_deferred("add_child",camera)
+		camera.translation = Vector3(0,4,10)
+	camera.make_current()
+	
+	return foundCameraTypes[mode]
