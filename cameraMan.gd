@@ -57,7 +57,7 @@ func Init(obj,mode):
 	player = obj
 	var world = obj.get_parent()
 	camera = Camera.new()
-	camera.far = 1000
+	camera.far = 2000
 	if mode == "ThirdPerson":
 		springarm = SpringArm.new()
 		player.get_node(mode).call_deferred("add_child", springarm)
