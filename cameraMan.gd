@@ -25,12 +25,18 @@ func Chase(target,close,far,delta):
 				chaser.translation.z -= 2.5*delta
 				
 func ThirdPerson(target,delta):
+	
 	var ShoulderPoint = target.get_node("ThirdPerson")
-	springarm.translation = ShoulderPoint.get_global_translation()
+	
+	# Thirdperson movment and camera is surprisingly difficult to generalize, will need to work on this more.
+	
+	#springarm.translation = ShoulderPoint.get_global_translation()
+	#springarm.rotation = ShoulderPoint.rotation
 	#var sp_loc = ShoulderPoint.get_global_translation()
 	#var sp_loc = ShoulderPoint.translation
 	#camera.look_at(sp_loc,Vector3.UP)
-	#camera.translation = Vector3(sp_loc.x,sp_loc.y,sp_loc.z + 5	)
+	#camera.translation = Vector3(sp_loc.x,sp_loc.y,sp_loc.z + 5)
+	
 	pass
 
 func Init(obj,mode):
@@ -57,7 +63,7 @@ func Init(obj,mode):
 		springarm.call_deferred("add_child", camera)
 		springarm.spring_length = 5
 		springarm.margin = 0.2
-		springarm.set_as_toplevel(true)
+		#springarm.set_as_toplevel(true)
 	else:
 		player.call_deferred("add_child",camera)
 		camera.translation = Vector3(0,4,10)
