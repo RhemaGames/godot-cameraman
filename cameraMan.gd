@@ -18,56 +18,71 @@ func Chase(target,close,far,delta):
 		camera.transform = chaser.transform
 		### Falls behind if obj is acellerating 
 		if target.movement_input["thrust"] == 1:
-			if chaser.translation.z < far:
-				chaser.translation.z += 2*delta
+			if chaser.position.z < far:
+				chaser.position.z += 2*delta
 		else:
-			if chaser.translation.z > close:
-				chaser.translation.z -= 2.5*delta
+			if chaser.position.z > close:
+				chaser.position.z -= 2.5*delta
 				
 func ThirdPerson(target,delta):
 	
 	var ShoulderPoint = target.get_node("ThirdPerson")
 	
-	# Thirdperson movment and camera is surprisingly difficult to generalize, will need to work on this more.
+	# Thirdperson movment and camera is surprisingly difficult to generalize, will need to work checked this more.
 	
-	#springarm.translation = ShoulderPoint.get_global_translation()
+	#springarm.position = ShoulderPoint.get_global_translation()
 	#springarm.rotation = ShoulderPoint.rotation
 	#var sp_loc = ShoulderPoint.get_global_translation()
-	#var sp_loc = ShoulderPoint.translation
+	#var sp_loc = ShoulderPoint.position
 	#camera.look_at(sp_loc,Vector3.UP)
-	#camera.translation = Vector3(sp_loc.x,sp_loc.y,sp_loc.z + 5)
+	#camera.position = Vector3(sp_loc.x,sp_loc.y,sp_loc.z + 5)
 	
 	pass
 
-func Init(obj,mode):
+func Orbit(target,_delta):
+	var OrbitPoint = target.get_node("Orbit")
+
+func Init(obj,mode,world):
 	
-	#### Find Camera 
-	#print_debug(world.find_node("Camera"))
+	#### Find Camera3D 
+	#print_debug(world.find_child("Camera3D"))
 	
 	### Find Types
 	for child in obj.get_children():
-		if child is Position3D:
+		if child is Marker3D:
 			if child.name in cameraTypes:
 				foundCameraTypes[child.name] = child
 	if foundCameraTypes:
 		print_debug("Found: ",foundCameraTypes)
 	else:
-		print_debug("No Camera types found")
+		print_debug("No Camera3D types found")
 	
 	player = obj
-	var world = obj.get_parent()
-	camera = Camera.new()
-	camera.far = 2000
-	if mode == "ThirdPerson":
-		springarm = SpringArm.new()
-		player.get_node(mode).call_deferred("add_child", springarm)
-		springarm.call_deferred("add_child", camera)
-		springarm.spring_length = 5
-		springarm.margin = 0.2
-		#springarm.set_as_toplevel(true)
-	else:
-		player.call_deferred("add_child",camera)
-		camera.translation = Vector3(0,4,10)
+	camera = Camera3D.new()
+	camera.far = 3000
+	
+	var env = world.get_node("WorldEnvironment").get_environment()
+	
+	camera.set_environment(env)
+	match mode:
+		"ThirdPerson":
+			springarm = SpringArm3D.new()
+			player.get_node(mode).call_deferred("add_child", springarm)
+			springarm.call_deferred("add_child", camera)
+			springarm.spring_length = 5
+			springarm.margin = 0.2
+		#springarm.set_as_top_level(true)
+		"Orbit":
+			if "Orbit" in foundCameraTypes:
+				foundCameraTypes["Orbit"].call_deferred("add_child",camera)
+				camera.position = Vector3(0,4,10)
+		"Chase":
+			player.call_deferred("add_child",camera)
+			camera.position = Vector3(0,4,10)
+		_:
+			player.call_deferred("add_child",camera)
+			camera.position = Vector3(0,4,10)
+			
 	camera.make_current()
 	
 	return foundCameraTypes[mode]
