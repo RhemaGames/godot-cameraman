@@ -13,7 +13,9 @@ func _ready():
 	pass # Replace with function body.
 
 func Chase(target,close,far,delta):
-	if camera and foundCameraTypes.has("Chase"):
+	if foundCameraTypes.has("Chase"):
+		camera = foundCameraTypes["Chase"].get_child(0)
+		camera.make_current()
 		var chaser = foundCameraTypes["Chase"]
 		camera.transform = chaser.transform
 		### Falls behind if obj is acellerating 
@@ -41,6 +43,9 @@ func ThirdPerson(target,delta):
 
 func Orbit(target,_delta):
 	var OrbitPoint = target.get_node("Orbit")
+	camera = foundCameraTypes["Orbit"].get_child(0)
+	camera.make_current()
+	
 
 func Init(obj,mode,world):
 	
@@ -77,7 +82,7 @@ func Init(obj,mode,world):
 				foundCameraTypes["Orbit"].call_deferred("add_child",camera)
 				camera.position = Vector3(0,4,10)
 		"Chase":
-			player.call_deferred("add_child",camera)
+			foundCameraTypes["Chase"].call_deferred("add_child",camera)
 			camera.position = Vector3(0,4,10)
 		_:
 			player.call_deferred("add_child",camera)
