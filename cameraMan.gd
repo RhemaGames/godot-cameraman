@@ -5,6 +5,7 @@ var springarm
 var player
 var cameraTypes = ["Chase","Orbit","Free","FirstPerson","ThirdPerson"]
 var foundCameraTypes:Dictionary
+@export var far = 3000
 
 signal locked()
 
@@ -66,23 +67,26 @@ func Init(obj,mode,world):
 	camera = Camera3D.new()
 	camera.far = 3000
 	
-	var env = world.get_node("WorldEnvironment").get_environment()
+	var env = WorldEnvironment.new()
+	if world.get_node("WorldEnviroment"):
+		env = world.get_node("WorldEnvironment").get_environment()
 	
 	camera.set_environment(env)
 	match mode:
 		"ThirdPerson":
 			springarm = SpringArm3D.new()
-			player.get_node(mode).call_deferred("add_child", springarm)
+			player.get_node(mode).add_child(springarm)
 			springarm.call_deferred("add_child", camera)
 			springarm.spring_length = 5
 			springarm.margin = 0.2
 		#springarm.set_as_top_level(true)
 		"Orbit":
 			if "Orbit" in foundCameraTypes:
-				foundCameraTypes["Orbit"].call_deferred("add_child",camera)
+				foundCameraTypes["Orbit"].add_child(camera)
 				camera.position = Vector3(0,4,10)
 		"Chase":
-			foundCameraTypes["Chase"].call_deferred("add_child",camera)
+			#foundCameraTypes["Chase"].call_deferred("add_child",camera)
+			foundCameraTypes["Chase"].add_child(camera)
 			camera.position = Vector3(0,4,10)
 		_:
 			player.call_deferred("add_child",camera)
