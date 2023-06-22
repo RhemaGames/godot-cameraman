@@ -68,7 +68,7 @@ func Init(obj,mode,world):
 	camera.far = 3000
 	
 	var env = WorldEnvironment.new()
-	if world.get_node("WorldEnviroment"):
+	if world.get_node("WorldEnvironment"):
 		env = world.get_node("WorldEnvironment").get_environment()
 	
 	camera.set_environment(env)
