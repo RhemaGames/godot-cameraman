@@ -5,7 +5,7 @@ var springarm
 var player
 var cameraTypes = ["Chase","Orbit","Free","FirstPerson","ThirdPerson"]
 var foundCameraTypes:Dictionary
-@export var far = 3000
+#@export var far = 3000
 
 signal locked()
 
@@ -27,7 +27,7 @@ func Chase(target,close,far,delta):
 			if chaser.position.z > close:
 				chaser.position.z -= 2.5*delta
 				
-func ThirdPerson(target,delta):
+func ThirdPerson(target,_delta):
 	
 	var ShoulderPoint = target.get_node("ThirdPerson")
 	
@@ -48,7 +48,7 @@ func Orbit(target,_delta):
 	camera.make_current()
 	
 
-func Init(obj,mode,world):
+func Init(obj,mode,world,far):
 	
 	#### Find Camera3D 
 	#print_debug(world.find_child("Camera3D"))
@@ -65,7 +65,7 @@ func Init(obj,mode,world):
 	
 	player = obj
 	camera = Camera3D.new()
-	camera.far = 3000
+	camera.far = far
 	
 	var env = WorldEnvironment.new()
 	if world.get_node("WorldEnvironment"):
