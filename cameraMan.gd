@@ -6,6 +6,7 @@ var player
 var cameraTypes = ["Chase","Orbit","Free","FirstPerson","ThirdPerson"]
 var foundCameraTypes:Dictionary
 #@export var far = 3000
+var use_ui_subviewport:bool = false
 
 signal locked()
 
@@ -15,8 +16,10 @@ func _ready():
 
 func Chase(target,close,far,delta):
 	if foundCameraTypes.has("Chase"):
-		camera = foundCameraTypes["Chase"].get_child(0)
-		camera.make_current()
+		camera = foundCameraTypes["Chase"].get_node("Camera")
+		if !camera.is_current():
+			camera.make_current()
+		
 		var chaser = foundCameraTypes["Chase"]
 		camera.transform = chaser.transform
 		### Falls behind if obj is acellerating 
@@ -65,7 +68,12 @@ func Init(obj,mode,world,far):
 	
 	player = obj
 	camera = Camera3D.new()
+	camera.name = "Camera"
 	camera.far = far
+	for i in range(1,10):
+		camera.set_cull_mask_value(i,false)
+	camera.set_cull_mask_value(1,true)
+	camera.set_cull_mask_value(obj.playerNum,true)
 	
 	var env = WorldEnvironment.new()
 	if world.get_node("WorldEnvironment"):
@@ -88,6 +96,10 @@ func Init(obj,mode,world,far):
 			#foundCameraTypes["Chase"].call_deferred("add_child",camera)
 			foundCameraTypes["Chase"].add_child(camera)
 			camera.position = Vector3(0,4,10)
+			if foundCameraTypes["Chase"].find_child("UI"):
+				var ui = foundCameraTypes["Chase"].get_node("UI")
+				ui.reparent(camera)
+				ui.position = Vector3(0,-0.25,-4.5)
 		_:
 			player.call_deferred("add_child",camera)
 			camera.position = Vector3(0,4,10)
